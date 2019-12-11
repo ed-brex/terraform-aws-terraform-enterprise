@@ -27,4 +27,6 @@ jobs:
           command: terraform validate
       - run:
           name: Check terraform formatting
+          # plan requires variables e.g.:
+          # -var 'domain=example.com' -var 'license_file=~/fake.rli' -var 'vpc_id=vpc-1234567890'
           command: terraform fmt -list=true -write=false -diff -check -recursive
