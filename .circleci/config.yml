@@ -7,13 +7,13 @@ workflows:
       - validate_module
 
 jobs:
-  environment:
-    # provider region is needed when running "terraform validate":
-    # # The provider region is needed for validate
-    AWS_DEFAULT_REGION: us-west-2
   validate_module:
     docker:
       - image: "hashicorp/terraform:0.12.18"
+    environment:
+      # provider region is needed when running "terraform validate":
+      # # The provider region is needed for validate
+      AWS_DEFAULT_REGION: us-west-2
     steps:
       - checkout
       - run:
