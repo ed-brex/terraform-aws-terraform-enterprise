@@ -7,12 +7,12 @@ resource "aws_security_group" "intra_vpc_and_egress" {
   # https://www.terraform.io/docs/providers/aws/r/security_group_rule.html
 
   tags = {
-    Name = "${var.prefix}"
+    Name = var.prefix
   }
 }
 
 resource "aws_security_group_rule" "intra_vpc_and_egress_ingress_rule" {
-  security_group_id = "${aws_security_group.intra_vpc_and_egress.id}"
+  security_group_id = aws_security_group.intra_vpc_and_egress.id
 
   type = "ingress"
 
@@ -23,7 +23,7 @@ resource "aws_security_group_rule" "intra_vpc_and_egress_ingress_rule" {
 }
 
 resource "aws_security_group_rule" "intra_vpc_and_egress_egress_rule" {
-  security_group_id = "${aws_security_group.intra_vpc_and_egress.id}"
+  security_group_id = aws_security_group.intra_vpc_and_egress.id
 
   type        = "egress"
   description = "outbound access to the world"

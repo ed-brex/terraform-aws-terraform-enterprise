@@ -4,33 +4,29 @@ workflows:
   version: 2
   test:
     jobs:
-      - format_check
-      - validation_check
+      - validate_module
 
 jobs:
-  format_check:
+  validate_module:
     docker:
-      - image: "hashicorp/terraform:0.12.13"
+      - image: "hashicorp/terraform:0.12.18"
+    environment:
+      # provider region is needed when running "terraform validate":
+      # # The provider region is needed for validate
+      AWS_DEFAULT_REGION: us-west-2
     steps:
       - checkout
+      - run:
+          name: Create fake license file
+          command: mkdir -p ./work/ && touch ./work/fake_license.rli
+      - run:
+          name: Initialize the module
+          command: terraform init -backend=false
+      - run:
+          name: Validate the module
+          command: terraform validate
       - run:
           name: Check terraform formatting
-          command: terraform fmt -check=true -write=false -diff
-  validation_check:
-    working_directory: ~
-    docker:
-      - image: "hashicorp/terraform:0.12.13"
-    steps:
-      - checkout
-      - run:
-          name: create fake license file
-          command: touch ~/fake.rli
-      - run:
-          name: create fake tfvars file and provider stub
-          command: echo -e "domain = \"example.com\"\nlicense_file = \"~/fake.rli\"\nvpc_id = \"vpc-1234567890\"\n" > terraform.tfvars
-      - run:
-          name: create provider stub
-          command: echo -e "provider \"aws\" {\n  region = \"us-west-2\"\n}\n" > provider.tf
-      - run:
-          name: init configs and check if valid
-          command: terraform init && terraform validate
+          # plan requires variables e.g.:
+          # -var 'domain=example.com' -var 'license_file=~/fake.rli' -var 'vpc_id=vpc-1234567890'
+          command: terraform fmt -list=true -write=false -diff -check -recursive
